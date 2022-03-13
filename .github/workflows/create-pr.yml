@@ -22,12 +22,14 @@ jobs:
         run: |
           echo "::set-output name=head_branch::${GITHUB_REF#refs/heads/}"
 
+      # マージ先のブランチを設定
       - id: set_base_branch
         name: Set base branch
         run: |
           base_branch='develop'
           echo "::set-output name=base_branch::$base_branch"
 
+      # PRタイトルを設定
       - id: set_pr_title
         name: Set PR title
         run: |
