@@ -40,7 +40,7 @@ jobs:
       - id: set_pr_template
         name: Set PR template
         run: |
-          pr_template=".github/${{ steps.set_head_branch.outputs.head_branch }}.md"
+          pr_template=".github/PULL_REQUEST_TEMPLATE/${{ steps.set_head_branch.outputs.head_branch }}.md"
           echo "::set-output name=pr_template::$pr_template"
 
       # リリース用PRが既に存在するかどうかをチェック
