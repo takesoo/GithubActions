@@ -22,7 +22,7 @@ jobs:
           pr_title="'Merge Develop into Main'"
           base_branch='main'
           head_branch='develop'
-          echo "::set-output name=count::$(gh pr list -H $head_branch -B $base_branch | wc -l)"
+          echo "::set-output name=count::$(gh pr list -H $head_branch -B $base_branch -F .github/pull_request_template.md | wc -l)"
           echo "::set-output name=pr_title::$pr_title"
           echo "::set-output name=base_branch::$base_branch"
 
