@@ -5,6 +5,7 @@ on:
     branches:
       - 'hoge'
       - 'fuga'
+      - 'develop'
 
 jobs:
   create-release-pr:
@@ -26,8 +27,11 @@ jobs:
       - id: set_base_branch
         name: Set base branch
         run: |
-          base_branch='develop'
-          echo "::set-output name=base_branch::$base_branch"
+          if [ ${{ steps.set_head_branch.outputs.head_branch }} -eq 'develop' ]; then
+            echo "::set-output name=base_branch::main"
+          else
+            echo "::set-output name=base_branch::develop"
+          fi
 
       # PRタイトルを設定
       - id: set_pr_title
