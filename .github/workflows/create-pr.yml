@@ -3,7 +3,8 @@ name: Create Pull Request
 on:
   push:
     branches:
-      - 'develop'
+      - 'hoge'
+      - 'fuga'
 
 jobs:
   create-release-pr:
@@ -15,19 +16,34 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      # リリース用PRが既に存在するかどうかをチェック
-      - name: Check if pr exists
-        id: check_pr
+      # 現在のブランチ名を取得
+      - id: set_head_branch
+        name: Set head branch
         run: |
-          pr_title="'Merge Develop into Main'"
-          base_branch='main'
-          head_branch='develop'
-          echo "::set-output name=count::$(gh pr list -H $head_branch -B $base_branch | wc -l)"
-          echo "::set-output name=pr_title::$pr_title"
+          echo "::set-output name=head_branch::${GITHUB_REF#refs/heads/}"
+
+      # マージ先のブランチを設定
+      - id: set_base_branch
+        name: Set base branch
+        run: |
+          base_branch='develop'
           echo "::set-output name=base_branch::$base_branch"
+
+      # PRタイトルを設定
+      - id: set_pr_title
+        name: Set PR title
+        run: |
+          pr_title="Merge ${{ steps.set_head_branch.outputs.head_branch }} into ${{ steps.set_base_branch.outputs.base_branch }}"
+          echo "::set-output name=pr_title::$pr_title"
+
+      # リリース用PRが既に存在するかどうかをチェック
+      - id: check_pr
+        name: Check if pr exists
+        run: |
+          echo "::set-output name=count::$(gh pr list -H ${{ steps.set_head_branch.outputs.head_branch }} -B ${{ steps.set_base_branch.outputs.base_branch }} | wc -l)"
 
       # リリース用PRを作成
       - name: Create release pr
         if: ${{ steps.check_pr.outputs.count == 0 }}
         run: |
-          gh pr create -B ${{ steps.check_pr.outputs.base_branch }} -t ${{ steps.check_pr.outputs.pr_title }} -F .github/pull_request_template.md
+          gh pr create -B ${{ steps.set_base_branch.outputs.base_branch }} -t "${{ steps.set_pr_title.outputs.pr_title }}" -F .github/pull_request_template.md
