@@ -36,6 +36,13 @@ jobs:
           pr_title="Merge ${{ steps.set_head_branch.outputs.head_branch }} into ${{ steps.set_base_branch.outputs.base_branch }}"
           echo "::set-output name=pr_title::$pr_title"
 
+      # PRテンプレートを設定
+      - id: set_pr_template
+        name: Set PR template
+        run: |
+          pr_template=".github/${{ steps.set_head_branch.outputs.head_branch }}.md"
+          echo "::set-output name=pr_template::$pr_template"
+
       # リリース用PRが既に存在するかどうかをチェック
       - id: check_pr
         name: Check if pr exists
@@ -46,4 +53,4 @@ jobs:
       - name: Create release pr
         if: ${{ steps.check_pr.outputs.count == 0 }}
         run: |
-          gh pr create -B ${{ steps.set_base_branch.outputs.base_branch }} -t "${{ steps.set_pr_title.outputs.pr_title }}" -F .github/pull_request_template.md
+          gh pr create -B ${{ steps.set_base_branch.outputs.base_branch }} -t "${{ steps.set_pr_title.outputs.pr_title }}" -F ${{ steps.set_pr_template.outputs.pr_template }}
