@@ -44,4 +44,4 @@ jobs:
       - name: Create release pr
         if: ${{ steps.check_pr.outputs.count == 0 }}
         run: |
-          gh pr create -B ${{ steps.set_head_branch.outputs.head_branch }} -t "${{ steps.set_pr_title.outputs.pr_title }}" -F .github/pull_request_template.md
+          gh pr create -B ${{ steps.set_base_branch.outputs.base_branch }} -t "${{ steps.set_pr_title.outputs.pr_title }}" -F .github/pull_request_template.md
