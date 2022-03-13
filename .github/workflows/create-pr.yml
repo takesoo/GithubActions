@@ -25,7 +25,8 @@ jobs:
       - id: set_base_branch
         name: Set base branch
         run: |
-          echo "::set-output name=base_branch::'develop'"
+          base_branch='develop'
+          echo "::set-output name=base_branch::$base_branch"
 
       - id: set_pr_title
         name: Set PR title
