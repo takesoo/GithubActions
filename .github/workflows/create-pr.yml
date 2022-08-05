@@ -47,14 +47,33 @@ jobs:
           pr_template=".github/pull_request_templates/${{ steps.set_head_branch.outputs.head_branch }}.md"
           echo "::set-output name=pr_template::$pr_template"
 
+      # reviewersを設定
+      - id: set_reviewers
+        name: Set reviewers
+        run: |
+          reviewers=takesoo
+          echo "::set-output name=reviewers::$reviewers"
+
       # リリース用PRが既に存在するかどうかをチェック
       - id: check_pr
         name: Check if pr exists
         run: |
           echo "::set-output name=count::$(gh pr list -H ${{ steps.set_head_branch.outputs.head_branch }} -B ${{ steps.set_base_branch.outputs.base_branch }} | wc -l)"
 
-      # リリース用PRを作成
+      # develop用PRを作成
       - name: Create release pr
-        if: ${{ steps.check_pr.outputs.count == 0 }}
+        if: ${{ steps.check_pr.outputs.count == 0 && steps.set_base_branch.outputs.base_branch == 'develop' }}
         run: |
           gh pr create -B ${{ steps.set_base_branch.outputs.base_branch }} -t "${{ steps.set_pr_title.outputs.pr_title }}" -F ${{ steps.set_pr_template.outputs.pr_template }}
+
+      # staging用PRを作成
+      - name: Create release pr
+        if: ${{ steps.check_pr.outputs.count == 0 && steps.set_base_branch.outputs.base_branch == 'staging' }}
+        run: |
+          gh pr create -B ${{ steps.set_base_branch.outputs.base_branch }} -t "${{ steps.set_pr_title.outputs.pr_title }}" -F ${{ steps.set_pr_template.outputs.pr_template }} -r ${{ steps.set_reviewers.outputs.reviewers }}
+
+      # main用PRを作成
+      - name: Create release pr
+        if: ${{ steps.check_pr.outputs.count == 0 && steps.set_base_branch.outputs.base_branch == 'main' }}
+        run: |
+          gh pr create -B ${{ steps.set_base_branch.outputs.base_branch }} -t "${{ steps.set_pr_title.outputs.pr_title }}" -F ${{ steps.set_pr_template.outputs.pr_template }} -r ${{ steps.set_reviewers.outputs.reviewers }} -l "release"
